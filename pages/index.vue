@@ -1,56 +1,17 @@
 <template>
   <div>
-    <v-app-bar
-      elevation="4"
-    >
-      <h3>NEWS</h3>
-    </v-app-bar>
-    <br>
+    <app-bar :keranjang="cart.length" />
     <div class="mx-6">
-      <v-btn @click="popup = true">button dialog</v-btn>
       <v-row class="mt-3">
-        <v-col cols="8" style="border:2px solid red">
+        <v-col cols="12" style="border:2px solid red">
           <v-row>
-            <v-col cols="4"
-            v-for="item in listMenu"
+            <v-col cols="3"
+              v-for="item in listMenu"
               :key="item.id"
             >
-              <v-card
-                elevation="2"
-                @click="pilihMenu(item)"
-              >
-                <img style="width:100%;height:200px" :src="item.image" alt="gambar1">
-                <div class="px-2">
-                  <h3 class="mt-2">{{ item.name }}</h3>
-                  <p>Kategori: {{ item.category }}</p>
-                  <div class="pb-2 d-flex justify-space-between">
-                    <div>Harga</div>
-                    <div style="color:red">Rp. {{ item.price }}</div>
-                  </div>
-                </div>
-              </v-card>
+              <list-iklan @TambahCart="funcTambahCart" :iklan="item" />
             </v-col>
           </v-row>
-        </v-col>
-        <v-col cols="4" style="border:2px solid blue">
-          <v-card
-            elevation="2"
-            v-if="menuDipilih.id !== undefined"
-          >
-            <img style="width:100%;height:200px" :src="menuDipilih.image" alt="gambar1">
-            <div class="px-2">
-              <h3 class="mt-2">{{ menuDipilih.name }}</h3>
-              <p v-if="menuDipilih.category.length > 5" >Kategori: {{ menuDipilih.category.substring(0,4) }}...</p>
-              <p v-else >Kategori: {{ menuDipilih.category }}</p>
-              <div class="pb-2 d-flex justify-space-between">
-                <div>Harga</div>
-                <div style="color:red">Rp. {{ menuDipilih.price }}</div>
-              </div>
-            </div>
-          </v-card>
-          <v-card v-else>
-            <h3>menu belum dipilih</h3>
-          </v-card>
         </v-col>
       </v-row>
     </div>
@@ -68,8 +29,15 @@
 </template>
 
 <script>
+import ListIklan from '@/components/ListIklan.vue'
 export default {
   name: 'IndexPage',
+  components: {
+    ListIklan: () =>
+      import(/* webpackChunkName: "list-iklan" */ '@/components/ListIklan.vue'),
+    AppBar: () =>
+      import(/* webpackChunkName: "app-bar" */ '@/components/AppBar.vue')
+  },
   data: () => ({
     listMenu:[
       {
@@ -180,6 +148,7 @@ export default {
     ],
     menuDipilih:{},
     popup:false,
+    cart:[],
 
     // listAlamat:{
     //   nama:"Hasan",
@@ -192,7 +161,12 @@ export default {
   methods: {
     pilihMenu(menu){
       this.menuDipilih = menu
-      this.popup = true
+      // this.popup = true
+    },
+    funcTambahCart: function(params){
+      this.cart.push(params)
+      console.log('cart', this.cart.length)
+      this.$cookies.set('cart', JSON.stringify(this.cart))
     }
   },
   created(){
